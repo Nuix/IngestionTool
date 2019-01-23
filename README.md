@@ -6,10 +6,14 @@ including:
     - Veritas Enterprise Vault
     - EMC EmailXtender/SourceOne
     - HP/Autonomy Zantaz EAS
-    - Daegis AXS-One.
+    - Daegis AXS-One
+    
 Converting legacy NSF data to modern email formats such as PST, MSG or EML.
+
 Extracting data from Exchange on-premise or Exchange Office 365 mailboxes/personal archives.
+
 Ingesting data to Exchange on-premise or Exchange Office 365 mailboxes/personal archives.
+
 Real-time statistics and progress of the migration project.
 
 Once setup, NEAMM can be configured to perform these actions on a single system. NEAMM can be installed and managed on multiple
