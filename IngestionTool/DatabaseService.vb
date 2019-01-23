@@ -953,6 +953,7 @@ Public Class DatabaseService
         Dim sInsertEWSIngestionData As String
         Dim sUpdateEWSIngestionData As String
         Dim iPercentCompleted As Integer
+        Dim sCustodainDBName As String
 
         Dim common As New Common
 
@@ -966,22 +967,23 @@ Public Class DatabaseService
                 End With
                 Using readerObject As SQLiteDataReader = SQLSelectCommand.ExecuteReader
                     While readerObject.Read
-                        sCustodianName = readerObject("CustodianName").ToString
+                        sCustodainDBName = readerObject("CustodianName").ToString
                     End While
                 End Using
             End Using
 
             SQLConnection.Close()
 
-            If sCustodianName = vbNullString Then
+            If sCustodainDBName = vbNullString Then
                 Using Connection As New SQLiteConnection("Data Source=" & sSqlDataBaseFullName & ";Version=3;New=False;Compress=True;")
-                    sInsertEWSIngestionData = "Insert into ewsIngestionStats (CustodianName, PSTPath, NumberOfPSTs, TotalSizeOfPSTs, GroupID, DestinationFolder, DestinationRoot, DestinationSMTP ProcessID, IngestionStartTime, IngestionEndTime, BytesUploaded, Success, Failed, ProcessingFilesDirectory, CaseDirectory, OutputDirectory, LogDirectory, SummaryReportLocation) Values "
-                    sInsertEWSIngestionData = sInsertEWSIngestionData & "(@CustodianName, @PSTPath, @NumberOfPSTs, @TotalSizeOfPSTs, @GroupID, @DestinationFolder, @DestinationRoot, @DestinationSMTP, @ProcessID, @IngestionStartTime, @IngestionEndTime, @BytesUploaded, @Success, @Failed, @ProcessingFilesDirectory, @CaseDirectory, @OutputDirectory, @LogDirectory, @SummaryReportLocation)"
+                    sInsertEWSIngestionData = "Insert into ewsIngestionStats (CustodianName, ProgressStatus, PSTPath, NumberOfPSTs, TotalSizeOfPSTs, GroupID, DestinationFolder, DestinationRoot, DestinationSMTP, ProcessID, IngestionStartTime, IngestionEndTime, BytesUploaded, Success, Failed, ProcessingFilesDirectory, CaseDirectory, OutputDirectory, LogDirectory, SummaryReportLocation) Values "
+                    sInsertEWSIngestionData = sInsertEWSIngestionData & "(@CustodianName, @ProgressStatus, @PSTPath, @NumberOfPSTs, @TotalSizeOfPSTs, @GroupID, @DestinationFolder, @DestinationRoot, @DestinationSMTP, @ProcessID, @IngestionStartTime, @IngestionEndTime, @BytesUploaded, @Success, @Failed, @ProcessingFilesDirectory, @CaseDirectory, @OutputDirectory, @LogDirectory, @SummaryReportLocation)"
                     Using oInsertEWSIngestionDataCommand As New SQLiteCommand()
                         With oInsertEWSIngestionDataCommand
                             .Connection = Connection
                             .CommandText = sInsertEWSIngestionData
                             .Parameters.AddWithValue("@CustodianName", sCustodianName)
+                            .Parameters.AddWithValue("@ProgressStatus", sProgressStatus)
                             .Parameters.AddWithValue("@PSTPath", sPSTPath)
                             .Parameters.AddWithValue("@NumberOfPSTs", iNumberOfPSTs)
                             .Parameters.AddWithValue("@TotalSizeOfPSTs", dblTotalPSTSize)
@@ -1014,7 +1016,7 @@ Public Class DatabaseService
 
             Else
                 Using Connection As New SQLiteConnection("Data Source=" & sSqlDataBaseFullName & ";Version=3;New=False;Compress=True;")
-                    sUpdateEWSIngestionData = "Update ewsIngestionStats set PSTPath = @PSTPath, ProcessID = @ProcessID, IngestionStartTime = @IngestionStartTime, IngestionEndTime = @IngestionEndTime, "
+                    sUpdateEWSIngestionData = "Update ewsIngestionStats set PSTPath = @PSTPath,ProgressStatus = @ProgressStatus,  ProcessID = @ProcessID, IngestionStartTime = @IngestionStartTime, IngestionEndTime = @IngestionEndTime, "
                     sUpdateEWSIngestionData = sUpdateEWSIngestionData & "BytesUploaded = @BytesUploaded, PercentCompleted = @PercentCompleted, Success = @Success, Failed = @Failed, ProcessingFilesDirectory = @ProcessingFilesDirectory, CaseDirectory = @CaseDirectory, OutputDirectory = @OutputDirectory, LogDirectory = @LogDirectory, SummaryReportLocation = @SummaryReportLocation WHERE CustodianName = @CustodianName"
 
                     Using oUpdateEWSIngestionDataCommand As New SQLiteCommand()

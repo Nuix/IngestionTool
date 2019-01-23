@@ -88,6 +88,7 @@ Partial Class frmNuixIngestion
         Me.ConsolidateExporterFiles = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.ConsolidateExporterMetricsFilesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ConsolidateExporterErrorsFilesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.fldCopySelector = New System.Windows.Forms.FolderBrowserDialog()
         CType(Me.grdPSTInfo, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.FileSystemWatcher1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.CaseLockWatcher, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -696,5 +697,5 @@ Partial Class frmNuixIngestion
     Friend WithEvents IngestionStartTime As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents IngestionEndTime As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents SummaryReportLocation As System.Windows.Forms.DataGridViewTextBoxColumn
-
+    Friend WithEvents fldCopySelector As FolderBrowserDialog
 End Class

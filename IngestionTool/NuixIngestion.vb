@@ -11,6 +11,7 @@ Public Class frmNuixIngestion
 
     Public lstSelectedCustodiansForProcessing As List(Of String)
     Public psSettingsFile As String
+    Public psNuixLogDir As String
     Public pbNoMoreJobs As Boolean
     Public psSummaryReportFile As String
     Public psIngestionLogFile As String
@@ -117,8 +118,9 @@ Public Class frmNuixIngestion
             MessageBox.Show("There was no log directory specified.  Please update settings to include log directory.", "No Log Directory Specified")
             Exit Sub
         End If
+        psNuixLogDir = eMailArchiveMigrationManager.NuixLogDir
 
-        psIngestionLogFile = "EWS Ingestion Log - " & sMachineName & "-" & DateTime.Now.ToString("yyyy-MM-dd hh-mm-ss") & ".log"
+        psIngestionLogFile = psNuixLogDir & "\" & "EWS Ingestion Log - " & sMachineName & "-" & DateTime.Now.ToString("yyyy-MM-dd hh-mm-ss") & ".log"
 
         common.Logger(psIngestionLogFile, "Nuix Email Archive Migration - Office 365 Ingestion Log")
         common.Logger(psIngestionLogFile, "Office 365 Exchange Server - " & eMailArchiveMigrationManager.O365ExchangeServer)
@@ -158,12 +160,31 @@ Public Class frmNuixIngestion
         Dim sSourceFolder As String
         Dim sDestinationFolder As String
         Dim sReportCSVFile As String
+        Dim sSQLiteDatabaseFullName As String
         Dim iReturn As DialogResult
         Dim common As New Common
+        Dim dbService As New DatabaseService
+        Dim sCustodianName As String
+        Dim sPSTPath As String
+        Dim sCopyDestinationFolder As String
+        Dim sCustodianSourceFolder As String
+        Dim lstPSTName As List(Of String)
+        Dim lstPSTPath As List(Of String)
+        Dim lstPSTSize As List(Of Double)
+        Dim lstNotStartedCustodians As List(Of String)
+        Dim lstInProgressCustodians As List(Of String)
+
+        lstPSTName = New List(Of String)
+        lstPSTPath = New List(Of String)
+        lstPSTSize = New List(Of Double)
+        lstNotStartedCustodians = New List(Of String)
+        lstInProgressCustodians = New List(Of String)
 
         Dim msgboxReturn As DialogResult
 
         Dim bStatus As Boolean
+
+        sSQLiteDatabaseFullName = eMailArchiveMigrationManager.SQLiteDBLocation & "\NuixEmailArchiveMigrationManager.db3"
 
         lstNotConsolidatedPSTs = New List(Of String)
         If grdPSTInfo.Rows.Count > 1 Then
@@ -186,7 +207,7 @@ Public Class frmNuixIngestion
 
         If lstNotConsolidatedPSTs.Count > 0 Then
             'MessageBox.Show("It appears that the PSTs on the file system have not been consolidated.  Please consolidate prior to migrating data.  Removing unconsolidated cusotdian information.")
-            msgboxReturn = MessageBox.Show("It appears that the PSTs on the file system have not been consolidated.  Please consolidate prior to migrating data.  Were the PSTs generated via a Nuix process?", "Consolidate Custodian PSTs", MessageBoxButtons.YesNoCancel)
+            msgboxReturn = MessageBox.Show("It appears that the PSTs on the file system have not been consolidated.  Please consolidate prior to migrating data.  Do the PSTs have a Nuix GUID suffix?", "Consolidate Custodian PSTs", MessageBoxButtons.YesNoCancel)
             If msgboxReturn = vbCancel Then
                 For Each CustodianNotConsolidated In lstNotConsolidatedPSTs
                     For Each row In grdPSTInfo.Rows
@@ -196,27 +217,82 @@ Public Class frmNuixIngestion
                     Next
                 Next
             ElseIf msgboxReturn = vbNo Then
-                grdPSTInfo.Rows.Clear()
-                If (txtPSTLocation.Text.Contains(".csv")) Then
-                    sSourceFolder = txtPSTLocation.Text.Substring(0, txtPSTLocation.Text.LastIndexOf("\"))
+                If eMailArchiveMigrationManager.PSTConsolidation = "Copy" Then
+                    If (txtPSTLocation.Text.Contains(".csv")) Then
+                        sCopyDestinationFolder = txtPSTLocation.Text.Substring(0, txtPSTLocation.Text.LastIndexOf("\"))
+                    Else
+                        sCopyDestinationFolder = txtPSTLocation.Text
+                    End If
+
+                    With fldCopySelector
+                        .SelectedPath = sSourceFolder
+                        If .ShowDialog = DialogResult.OK Then
+                            sCopyDestinationFolder = .SelectedPath
+                        Else
+                            Exit Sub
+                        End If
+                    End With
                 Else
-                    sSourceFolder = txtPSTLocation.Text
+                    If (txtPSTLocation.Text.Contains(".csv")) Then
+                        sCopyDestinationFolder = txtPSTLocation.Text.Substring(0, txtPSTLocation.Text.LastIndexOf("\"))
+                    Else
+                        sCopyDestinationFolder = txtPSTLocation.Text
+                    End If
                 End If
+                grdPSTInfo.Rows.Clear()
 
                 For Each Custodian In lstNotConsolidatedPSTs
-                    sDestinationFolder = sSourceFolder & "\" & Custodian.ToString
-                    common.Logger(psIngestionLogFile, "Consolidating Custodian PST Information in - " & sSourceFolder)
-
-                    bStatus = blnConsolidateCustodianPSTs(sSourceFolder, Custodian.ToString, sDestinationFolder)
+                    sDestinationFolder = sCopyDestinationFolder & "\" & Custodian.ToString
+                    My.Computer.FileSystem.CreateDirectory(sDestinationFolder)
+                    If (txtPSTLocation.Text.Contains(".csv")) Then
+                        sCustodianSourceFolder = txtPSTLocation.Text.Substring(0, txtPSTLocation.Text.LastIndexOf("\"))
+                    Else
+                        sCustodianSourceFolder = txtPSTLocation.Text
+                    End If
+                    common.Logger(psIngestionLogFile, "Consolidating Custodian PST Information in - " & sCustodianSourceFolder & " to " & sDestinationFolder)
+                    bStatus = blnConsolidateCustodianPSTs(sCustodianSourceFolder, Custodian.ToString, sDestinationFolder)
+                    'bStatus = dbService.UpdateCustodianIngestionValues(eMailArchiveMigrationManager.SQLiteDBLocation, Custodian.ToString, "PSTPath", sDestinationFolder)
+                    bStatus = blnLoadPSTInfoFromDirectory(sCopyDestinationFolder & "\" & Custodian.ToString, grdPSTInfo, lstNotConsolidatedPSTs)
                 Next
-                bStatus = blnLoadPSTInfoFromDirectory(sPSTFolderName, grdPSTInfo, lstNotConsolidatedPSTs)
+                '                bStatus = blnLoadPSTInfoFromDirectory(sPSTFolderName, grdPSTInfo, lstNotConsolidatedPSTs)
+                grdPSTInfo.Rows.Clear()
+                bStatus = blnLoadGridFromDB(grdPSTInfo, lstNotStartedCustodians, lstInProgressCustodians)
+
                 MessageBox.Show("PST Consolidation complete.", "PST Consolidation")
             ElseIf msgboxReturn = vbYes Then
-                bStatus = blnConsolidateNuixPSTs(txtPSTLocation.Text, txtPSTLocation.Text, sReportCSVFile)
+                If eMailArchiveMigrationManager.PSTConsolidation = "Copy" Then
+                    If (txtPSTLocation.Text.Contains(".csv")) Then
+                        sCopyDestinationFolder = txtPSTLocation.Text.Substring(0, txtPSTLocation.Text.LastIndexOf("\"))
+                    Else
+                        sCopyDestinationFolder = txtPSTLocation.Text
+                    End If
+
+                    With fldCopySelector
+                        .SelectedPath = sSourceFolder
+                        If .ShowDialog = DialogResult.OK Then
+                            sCopyDestinationFolder = .SelectedPath
+                        Else
+                            Exit Sub
+                        End If
+                    End With
+                Else
+                    If (txtPSTLocation.Text.Contains(".csv")) Then
+                        sCopyDestinationFolder = txtPSTLocation.Text.Substring(0, txtPSTLocation.Text.LastIndexOf("\"))
+                    Else
+                        sCopyDestinationFolder = txtPSTLocation.Text
+                    End If
+                End If
+                If (txtPSTLocation.Text.Contains(".csv")) Then
+                    sCustodianSourceFolder = txtPSTLocation.Text.Substring(0, txtPSTLocation.Text.LastIndexOf("\"))
+                Else
+                    sCustodianSourceFolder = txtPSTLocation.Text
+                End If
+                common.Logger(psIngestionLogFile, "Consolidating Custodian PST Information in - " & sCustodianSourceFolder & " to " & sDestinationFolder)
+
+                bStatus = blnConsolidateNuixPSTs(sCustodianSourceFolder, sCopyDestinationFolder, sReportCSVFile)
                 grdPSTInfo.Rows.Clear()
                 bStatus = blnLoadPSTInfoFromCSV(sReportCSVFile, grdPSTInfo, True, lstNotConsolidatedPSTs)
                 MessageBox.Show("PST Consolidation complete.", "PST Consolidation")
-
             End If
 
         End If
@@ -226,6 +302,7 @@ Public Class frmNuixIngestion
         Else
             btnProcessingDetails.Enabled = False
         End If
+
     End Sub
 
     Private Function blnConsolidateNuixPSTs(ByVal sSourceFolder As String, ByVal sDestinationFolder As String, ByRef sReportCSVFile As String) As Boolean
@@ -373,8 +450,6 @@ Public Class frmNuixIngestion
 
         sSQLiteDatabaseFullName = eMailArchiveMigrationManager.SQLiteDBLocation & "\NuixEmailArchiveMigrationManager.db3"
 
-
-
         lstCustodianName = New List(Of String)
         lstCustodianPSTs = New List(Of String)
         lstPSTSize = New List(Of Double)
@@ -394,7 +469,7 @@ Public Class frmNuixIngestion
                     sCurrentPSTNames = lstCustodianPSTs(iCustodianLocation)
                     lstCustodianPSTs(iCustodianLocation) = sCurrentPSTNames & "," & asCurrentRow(1)
                     dblCurrentPSTSize = lstPSTSize(iCustodianLocation)
-                    lstPSTSize(iCustodianLocation) = dblCurrentPSTSize + CInt(asCurrentRow(2))
+                    lstPSTSize(iCustodianLocation) = dblCurrentPSTSize + CDbl(asCurrentRow(2))
                     If Not LCase(lstPSTPath(iCustodianLocation)).ToString.Contains(LCase(lstCustodianName(iCustodianLocation))) Then
                         lstNotConsolidatedCustodian.Add(asCurrentRow(0))
                     End If
@@ -404,7 +479,7 @@ Public Class frmNuixIngestion
                 Else
                     lstCustodianName.Add(asCurrentRow(0).ToString.ToLower)
                     lstCustodianPSTs.Add(asCurrentRow(1).ToString.ToLower)
-                    lstPSTSize.Add(CInt(asCurrentRow(2)))
+                    lstPSTSize.Add(CDbl(asCurrentRow(2)))
                     lstPSTPath.Add(asCurrentRow(3).ToString.ToLower)
                 End If
 
@@ -2022,7 +2097,7 @@ Public Class frmNuixIngestion
 
     End Function
 
-    Private Function blnConsolidateCustodianPSTs(ByRef sSourceFolder As String, sCustodianName As String, ByVal sDestinationFolder As String) As Boolean
+    Private Function blnConsolidateCustodianPSTs(ByRef sSourceFolder As String, ByVal sCustodianName As String, ByVal sDestinationFolder As String) As Boolean
         Dim lstPSTName As New List(Of String)
         Dim lstPSTPath As New List(Of String)
         Dim lstPSTSize As New List(Of Double)
@@ -2031,6 +2106,7 @@ Public Class frmNuixIngestion
         Dim sNewFileName As String
         Dim iEmailCounter As Integer
         Dim sPSTName As String
+        Dim dbService As New DatabaseService
 
         blnConsolidateCustodianPSTs = True
         StartDate = Now
@@ -2056,12 +2132,14 @@ Public Class frmNuixIngestion
 
             If eMailArchiveMigrationManager.PSTConsolidation = "Move" Then
                 My.Computer.FileSystem.MoveFile(lstPSTPath(iEmailCounter) & "\" & sPSTName & ".pst", sDestinationFolder & "\" & sNewFileName)
+
             ElseIf eMailArchiveMigrationManager.PSTConsolidation = "Copy" Then
                 My.Computer.FileSystem.CopyFile(lstPSTPath(iEmailCounter) & "\" & sPSTName & ".pst", sDestinationFolder & "\" & sNewFileName)
 
             End If
             iEmailCounter = iEmailCounter + 1
         Next
+
         blnConsolidateCustodianPSTs = True
     End Function
     Sub subPSTDirSearch(ByVal sDir As String, ByRef PSTName As List(Of String), ByRef PSTPath As List(Of String), ByRef PSTSize As List(Of Double))
