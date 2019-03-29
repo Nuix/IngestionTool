@@ -164,8 +164,6 @@ Public Class frmNuixIngestion
         Dim iReturn As DialogResult
         Dim common As New Common
         Dim dbService As New DatabaseService
-        Dim sCustodianName As String
-        Dim sPSTPath As String
         Dim sCopyDestinationFolder As String
         Dim sCustodianSourceFolder As String
         Dim lstPSTName As List(Of String)
@@ -982,7 +980,7 @@ Public Class frmNuixIngestion
 
         Dim sSQLiteDatabaseFullName As String
 
-        sSQLiteDatabaseFullName = eMailArchiveMigrationManager.SQLiteDBLocation & "\NuixEmailArchiveMigrationManager.db3"
+        sSQLiteDatabaseFullName = psSQLiteLocation & "\NuixEmailArchiveMigrationManager.db3"
 
 
         bNoMoreJobs = False
@@ -2771,7 +2769,6 @@ Public Class frmNuixIngestion
 
     Public Function blnMoveCustodianFolder(ByVal sCustodianName As String, ByVal sCustodianFolder As String, ByVal sNewFolder As String, ByRef sInvalidFolder As String) As Boolean
         blnMoveCustodianFolder = False
-        Dim bStatus As Boolean
 
         Dim common As New Common
 
@@ -2820,7 +2817,6 @@ Public Class frmNuixIngestion
         Dim sCurrentPSTLocation As String
         Dim msgboxReturn As DialogResult
         Dim sInvalidFolder As String
-        Dim sPSTDirectory As String
         Dim lstCurrerntCustodianFolder As List(Of String)
         Dim dbService As New DatabaseService
 

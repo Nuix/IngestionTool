@@ -135,6 +135,8 @@ Partial Class O365ExtractionSettings
         Me.lblTotalSystemMemory = New System.Windows.Forms.Label()
         Me.tabEWSSettings = New System.Windows.Forms.TabPage()
         Me.grpOffice365Settings = New System.Windows.Forms.GroupBox()
+        Me.lblPSTConsolidation = New System.Windows.Forms.Label()
+        Me.cboPSTConsolidation = New System.Windows.Forms.ComboBox()
         Me.grpEWSDownloadControl = New System.Windows.Forms.GroupBox()
         Me.chkEnableMailboxSlackspace = New System.Windows.Forms.CheckBox()
         Me.chkCollaborativePrefetching = New System.Windows.Forms.CheckBox()
@@ -204,8 +206,6 @@ Partial Class O365ExtractionSettings
         Me.btnLoadSettingXML = New System.Windows.Forms.Button()
         Me.btnSettingsOK = New System.Windows.Forms.Button()
         Me.GlobalSettingsToolTip = New System.Windows.Forms.ToolTip(Me.components)
-        Me.cboPSTConsolidation = New System.Windows.Forms.ComboBox()
-        Me.lblPSTConsolidation = New System.Windows.Forms.Label()
         Me.tabParallelProcessingSettings.SuspendLayout()
         Me.tabLicensingSettings.SuspendLayout()
         Me.grpNMSSettings.SuspendLayout()
@@ -1502,6 +1502,24 @@ Partial Class O365ExtractionSettings
         Me.grpOffice365Settings.TabStop = False
         Me.grpOffice365Settings.Text = "EWS Connection"
         '
+        'lblPSTConsolidation
+        '
+        Me.lblPSTConsolidation.AutoSize = True
+        Me.lblPSTConsolidation.Location = New System.Drawing.Point(196, 132)
+        Me.lblPSTConsolidation.Name = "lblPSTConsolidation"
+        Me.lblPSTConsolidation.Size = New System.Drawing.Size(97, 13)
+        Me.lblPSTConsolidation.TabIndex = 111
+        Me.lblPSTConsolidation.Text = "PST Consolidation:"
+        '
+        'cboPSTConsolidation
+        '
+        Me.cboPSTConsolidation.FormattingEnabled = True
+        Me.cboPSTConsolidation.Items.AddRange(New Object() {"Copy", "Move"})
+        Me.cboPSTConsolidation.Location = New System.Drawing.Point(301, 128)
+        Me.cboPSTConsolidation.Name = "cboPSTConsolidation"
+        Me.cboPSTConsolidation.Size = New System.Drawing.Size(86, 21)
+        Me.cboPSTConsolidation.TabIndex = 110
+        '
         'grpEWSDownloadControl
         '
         Me.grpEWSDownloadControl.Controls.Add(Me.chkEnableMailboxSlackspace)
@@ -2203,24 +2221,6 @@ Partial Class O365ExtractionSettings
         'GlobalSettingsToolTip
         '
         Me.GlobalSettingsToolTip.IsBalloon = True
-        '
-        'cboPSTConsolidation
-        '
-        Me.cboPSTConsolidation.FormattingEnabled = True
-        Me.cboPSTConsolidation.Items.AddRange(New Object() {"Copy", "Move"})
-        Me.cboPSTConsolidation.Location = New System.Drawing.Point(301, 128)
-        Me.cboPSTConsolidation.Name = "cboPSTConsolidation"
-        Me.cboPSTConsolidation.Size = New System.Drawing.Size(86, 21)
-        Me.cboPSTConsolidation.TabIndex = 110
-        '
-        'lblPSTConsolidation
-        '
-        Me.lblPSTConsolidation.AutoSize = True
-        Me.lblPSTConsolidation.Location = New System.Drawing.Point(196, 132)
-        Me.lblPSTConsolidation.Name = "lblPSTConsolidation"
-        Me.lblPSTConsolidation.Size = New System.Drawing.Size(97, 13)
-        Me.lblPSTConsolidation.TabIndex = 111
-        Me.lblPSTConsolidation.Text = "PST Consolidation:"
         '
         'O365ExtractionSettings
         '

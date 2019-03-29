@@ -93,9 +93,7 @@ Public Class DatabaseService
 
     Public Function UpdateExtractionDBInfo(ByVal sSQLiteLocation As String, ByVal sCustodianName As String, ByVal sFieldName As String, sFieldValue As String) As Boolean
         UpdateExtractionDBInfo = False
-        Dim iReturnValue As Integer
         Dim sUpdateArchiveExtractionData As String
-        Dim bProcessTerminated As Boolean
 
         Using Connection As New SQLiteConnection("Data Source=" & sSQLiteLocation & "\NuixEmailArchiveMigrationManager.db3;Version=3;New=False;Compress=True;")
             sUpdateArchiveExtractionData = "Update ewsExtractionStats set " & sFieldName & " = " & "@" & sFieldName
@@ -124,7 +122,6 @@ Public Class DatabaseService
     Public Function UpdateSQLiteAllBatchInfo(ByVal sSqlDataBaseFullName As String, ByVal sCustodianName As String, ByRef iCustodianID As Integer, ByVal sGroupID As String, ByVal sStatus As String, ByVal sProcessID As String, ByVal sRedisSettings As String, ByVal sSourceType As String, ByVal sSourceFormat As String, ByVal sOutputType As String, ByVal sOutputFormat As String, ByVal sConversionStartTime As String, ByVal sConversionEndTime As String, ByVal iBytesProcessed As Integer, ByVal iPercentComplete As Integer, ByVal iSuccess As Integer, ByVal iFailed As Integer, ByVal sSummaryReportLocation As String) As Boolean
         UpdateSQLiteAllBatchInfo = False
         Dim sInsertArchiveExtractionData As String
-        Dim sUpdateEArchiveExtractionData As String
         Dim sQueryReturnedCustodianID As String
         Dim SQLiteConnection As SQLiteConnection
 
@@ -188,7 +185,6 @@ Public Class DatabaseService
     Public Function InsertDataConversionStats(ByVal sSqlDataBaseFullName As String, ByVal sCustodianName As String, ByRef iCustodianID As Integer, ByVal sGroupID As String, ByVal sStatus As String, ByVal sProcessID As String, ByVal sRedisSettings As String, ByVal sSourceType As String, ByVal sSourceFormat As String, ByVal sOutputType As String, ByVal sOutputFormat As String, ByVal sConversionStartTime As String, ByVal sConversionEndTime As String, ByVal iBytesProcessed As Integer, ByVal iPercentComplete As Integer, ByVal iSuccess As Integer, ByVal iFailed As Integer, ByVal sSummaryReportLocation As String) As Boolean
         InsertDataConversionStats = False
         Dim sInsertArchiveExtractionData As String
-        Dim sUpdateEArchiveExtractionData As String
         Dim sQueryReturnedCustodianID As String
         Dim SQLiteConnection As SQLiteConnection
 
@@ -382,12 +378,9 @@ Public Class DatabaseService
         GetCustodianPSTLocation = True
     End Function
     Public Function GetCustodianRowID(ByVal sSqlDataBaseFullName As String, ByVal sCustodianName As String, ByRef iCustodianRowID As Integer) As Boolean
-        Dim bStatus As Boolean
 
         GetCustodianRowID = False
 
-        Dim sInsertArchiveExtractionData As String
-        Dim sUpdateEArchiveExtractionData As String
         Dim sQueryReturnedCustodianID As String
         Dim SQLiteConnection As SQLiteConnection
 
@@ -511,9 +504,7 @@ Public Class DatabaseService
     End Function
     Public Function UpdateArchiveExtractCustodianInfo(ByVal sSQLiteLocation As String, ByVal sBatchName As String, ByVal sFieldName As String, sFieldValue As String) As Boolean
         UpdateArchiveExtractCustodianInfo = False
-        Dim iReturnValue As Integer
         Dim sUpdateArchiveExtractionData As String
-        Dim bProcessTerminated As Boolean
 
         Using Connection As New SQLiteConnection("Data Source=" & sSQLiteLocation & "\NuixEmailArchiveMigrationManager.db3;Version=3;New=False;Compress=True;")
             sUpdateArchiveExtractionData = "Update archiveExtractionStats set " & sFieldName & " = " & "@" & sFieldName
@@ -541,9 +532,7 @@ Public Class DatabaseService
 
     Public Function UpdateCustodianIngestionValues(ByVal sSQLiteLocation As String, ByVal sCustodianName As String, ByVal sFieldName As String, sFieldValue As String) As Boolean
         UpdateCustodianIngestionValues = False
-        Dim iReturnValue As Integer
         Dim sUpdateArchiveExtractionData As String
-        Dim bProcessTerminated As Boolean
 
         Using Connection As New SQLiteConnection("Data Source=" & sSQLiteLocation & "\NuixEmailArchiveMigrationManager.db3;Version=3;New=False;Compress=True;")
             sUpdateArchiveExtractionData = "Update ewsIngestionStats set " & sFieldName & " = " & "@" & sFieldName
@@ -682,9 +671,6 @@ Public Class DatabaseService
 
     Public Function CheckSQLConnection(ByVal sAuthType As String, ByVal sHostName As String, ByVal sPort As String, ByVal sDBName As String, ByVal sSQLUserName As String, ByVal sSQLPW As String, ByVal sDomain As String) As Boolean
         Dim Connection As SqlConnection
-        Dim Command As SqlCommand
-        Dim DataReader As SqlDataReader
-        Dim results As String
         Dim sConnection As String
         Dim common As New Common
 
@@ -780,7 +766,6 @@ Public Class DatabaseService
     Public Function UpdateDataConversionStatBatchInfo(ByVal sSQLLiteLocation As String, ByVal sCustodianName As String, ByRef iCustodianID As Integer, ByVal sGroupID As String, ByVal sStatus As String, ByVal sProcessID As String, ByVal sRedisSettings As String, ByVal sSourceType As String, ByVal sSourceFormat As String, ByVal sOutputType As String, ByVal sOutputFormat As String, ByVal sConversionStartTime As String, ByVal sConversionEndTime As String, ByVal iBytesProcessed As Integer, ByVal iPercentComplete As Integer, ByVal iSuccess As Integer, ByVal iFailed As Integer, ByVal sSummaryReportLocation As String) As Boolean
         UpdateDataConversionStatBatchInfo = False
         Dim sInsertArchiveExtractionData As String
-        Dim sUpdateEArchiveExtractionData As String
         Dim sQueryReturnedCustodianID As String
         Dim SQLiteConnection As SQLiteConnection
 
@@ -1017,7 +1002,7 @@ Public Class DatabaseService
             Else
                 Using Connection As New SQLiteConnection("Data Source=" & sSqlDataBaseFullName & ";Version=3;New=False;Compress=True;")
                     sUpdateEWSIngestionData = "Update ewsIngestionStats set PSTPath = @PSTPath,ProgressStatus = @ProgressStatus,  ProcessID = @ProcessID, IngestionStartTime = @IngestionStartTime, IngestionEndTime = @IngestionEndTime, "
-                    sUpdateEWSIngestionData = sUpdateEWSIngestionData & "BytesUploaded = @BytesUploaded, PercentCompleted = @PercentCompleted, Success = @Success, Failed = @Failed, ProcessingFilesDirectory = @ProcessingFilesDirectory, CaseDirectory = @CaseDirectory, OutputDirectory = @OutputDirectory, LogDirectory = @LogDirectory, SummaryReportLocation = @SummaryReportLocation WHERE CustodianName = @CustodianName"
+                    sUpdateEWSIngestionData = sUpdateEWSIngestionData & "BytesUploaded = @BytesUploaded, DestinationFolder = @DestinationFolder, DestinationRoot = @DestinationRoot, DestinationSMTP = @DestinationSMTP, PercentCompleted = @PercentCompleted, Success = @Success, Failed = @Failed, ProcessingFilesDirectory = @ProcessingFilesDirectory, CaseDirectory = @CaseDirectory, OutputDirectory = @OutputDirectory, LogDirectory = @LogDirectory, SummaryReportLocation = @SummaryReportLocation WHERE CustodianName = @CustodianName"
 
                     Using oUpdateEWSIngestionDataCommand As New SQLiteCommand()
                         With oUpdateEWSIngestionDataCommand
@@ -1031,6 +1016,9 @@ Public Class DatabaseService
                             .Parameters.AddWithValue("@IngestionEndTime", sIngestionEndTime)
                             .Parameters.AddWithValue("@BytesUploaded", dblBytesUploaded)
                             .Parameters.AddWithValue("@PercentCompleted", iPercentCompleted)
+                            .Parameters.AddWithValue("@DestinationFolder", sDestinationFolder)
+                            .Parameters.AddWithValue("@DestinationRoot", sDestinationRoot)
+                            .Parameters.AddWithValue("@DestinationSMTP", sDestinationSMTP)
                             .Parameters.AddWithValue("@Success", dblSuccess)
                             .Parameters.AddWithValue("@Failed", dblFailed)
                             .Parameters.AddWithValue("@ProcessingFilesDirectory", sProcessingFilesDirectory)

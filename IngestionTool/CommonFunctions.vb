@@ -19,9 +19,7 @@ Module CommonFunctions
 
     Public Function blnUpdateCustodianDBInfo(ByVal sSQLiteLocation As String, ByVal sCustodianName As String, ByVal sFieldName As String, sFieldValue As String) As Boolean
         blnUpdateCustodianDBInfo = False
-        Dim iReturnValue As Integer
         Dim sUpdateArchiveExtractionData As String
-        Dim bProcessTerminated As Boolean
 
         Using Connection As New SQLiteConnection("Data Source=" & sSQLiteLocation & "\NuixEmailArchiveMigrationManager.db3;Version=3;New=False;Compress=True;")
             sUpdateArchiveExtractionData = "Update DataConversionStats set " & sFieldName & " = " & "@" & sFieldName
@@ -50,9 +48,7 @@ Module CommonFunctions
 
     Public Function blnUpdateExtractionDBInfo(ByVal sSQLiteLocation As String, ByVal sCustodianName As String, ByVal sFieldName As String, sFieldValue As String) As Boolean
         blnUpdateExtractionDBInfo = False
-        Dim iReturnValue As Integer
         Dim sUpdateArchiveExtractionData As String
-        Dim bProcessTerminated As Boolean
 
         Using Connection As New SQLiteConnection("Data Source=" & sSQLiteLocation & "\NuixEmailArchiveMigrationManager.db3;Version=3;New=False;Compress=True;")
             sUpdateArchiveExtractionData = "Update ewsExtractionStats set " & sFieldName & " = " & "@" & sFieldName
@@ -82,7 +78,6 @@ Module CommonFunctions
     Public Function blnInsertDataConversionStats(ByVal sCustodianName As String, ByRef iCustodianID As Integer, ByVal sGroupID As String, ByVal sStatus As String, ByVal sProcessID As String, ByVal sRedisSettings As String, ByVal sSourceType As String, ByVal sSourceFormat As String, ByVal sOutputType As String, ByVal sOutputFormat As String, ByVal sConversionStartTime As String, ByVal sConversionEndTime As String, ByVal iBytesProcessed As Integer, ByVal iPercentComplete As Integer, ByVal iSuccess As Integer, ByVal iFailed As Integer, ByVal sSummaryReportLocation As String) As Boolean
         blnInsertDataConversionStats = False
         Dim sInsertArchiveExtractionData As String
-        Dim sUpdateEArchiveExtractionData As String
         Dim sQueryReturnedCustodianID As String
         Dim SQLiteConnection As SQLiteConnection
 
@@ -195,7 +190,6 @@ Module CommonFunctions
     End Function
 
     Public Function blnLoadPNSFInfoFromDirectory(ByVal sNSFFolderName As String, ByVal grdNSFInfo As DataGridView) As Boolean
-        Dim bStatus As Boolean
         Dim ReportOutputFile As StreamWriter
         Dim sMachineName As String
         Dim sOutputFileName As String
@@ -267,12 +261,9 @@ Module CommonFunctions
     End Sub
 
     Public Function blnGetCustodianRowID(ByVal sCustodianName As String, ByRef iCustodianRowID As Integer) As Boolean
-        Dim bStatus As Boolean
 
         blnGetCustodianRowID = False
 
-        Dim sInsertArchiveExtractionData As String
-        Dim sUpdateEArchiveExtractionData As String
         Dim sQueryReturnedCustodianID As String
         Dim SQLiteConnection As SQLiteConnection
 
@@ -307,8 +298,6 @@ Module CommonFunctions
         Dim bStatus As Boolean
         Dim sRubyFileName As String
         Dim sMappingFileName As String
-        Dim sRubyFilePSTLocation As String
-        Dim sNewPSTLocation As String
         Dim sJSonFileName As String
         Dim sEvidenceKeyStore As String
         Dim sEvidencePassword As String
@@ -562,12 +551,6 @@ Module CommonFunctions
     Public Function blnBuildJSonFile(ByVal sJSonFileName As String, sSourceFolders As String, ByVal sEvidenceKeyStore As String, ByVal sEvidencePassword As String, ByVal sCaseName As String, ByVal sSourceSize As String, ByVal sMigrationType As String) As Boolean
         blnBuildJSonFile = False
 
-        Dim sCustodianName As String
-        Dim dblPSTSourceSize As Double
-        Dim sDestinationFolder As String
-        Dim sDestinationRoot As String
-        Dim sDestinationSMTPAddress As String
-        Dim sCustodianPSTPath As String
 
         Dim CustodianJSon As StreamWriter
 
@@ -617,7 +600,6 @@ Module CommonFunctions
         blnBuildNSFConversionRubyScript = False
 
         Dim NSFConversionRuby As StreamWriter
-        Dim asSourceLocations() As String
 
         NSFConversionRuby = New StreamWriter(sRubyScriptFileName)
 
@@ -918,17 +900,10 @@ Module CommonFunctions
 
     Public Function blnProcessSummaryReportFiles(ByVal sSummaryReportFile As String, ByRef sTotalItemsProcessed As String, ByRef sTotalItemsExported As String, ByRef sTotalItemsSkipped As String, ByRef sTotalItemsFailed As String) As Boolean
         Dim sCurrentRow As String
-        Dim asErrorArray() As String
-        Dim asSuccessItems() As String
-        Dim asCustodianInfo() As String
         Dim fileSummaryFile As StreamReader
         Dim iCounter As Integer
         Dim bFailedItemStart As Boolean
 
-        Dim iErrorIndex As Integer
-        Dim iArrayCount As Integer
-        Dim dblCurrentCount As Integer
-        Dim sCurrentErrorDetail As String
         Dim common As New Common
 
         blnProcessSummaryReportFiles = True
@@ -2767,7 +2742,6 @@ Module CommonFunctions
     Public Function blnBuildWSSFullRuby(ByVal sRubyScriptFileName As String, ByVal sNuixFilesDir As String) As Boolean
         blnBuildWSSFullRuby = False
 
-        Dim WSSFullRuby As StreamWriter
 
         '      WSSFullRuby = New StreamWriter(sRubyScriptFileName)
         '      WSSFullRuby.WriteLine("")
@@ -3213,26 +3187,16 @@ Module CommonFunctions
 
     Public Function blnBuildFinalArchiveExtractionWSSJSon(ByVal sWSSJsonFileName As String, ByVal sArchiveType As String, ByVal lstWSSSettings As List(Of String), ByVal sProcessingType As String, ByVal sCaseDirectory As String) As Boolean
         Dim sMachineName As String
-        Dim sOutputFileName As String
 
         Dim sFileFiltering As String
         Dim sFilterFileExt As String
-        Dim sCommunicationCSV As String
-        Dim sPropertiesCSV As String
         Dim sMappingCSV As String
-        Dim sCaseSensitive As String
         Dim sVerbose As String
         Dim sUnresponsive As String
         Dim sTagItems As String
         Dim sTagUnique As String
-        Dim sReportItems As String
-        Dim sReportQueries As String
         Dim sExcludeItem As String
-        Dim sFilterMimeTypes As String
         Dim sFilterKinds As String
-        Dim sTextQueriesCSV As String
-        Dim sUseRegEx As String
-        Dim sReportDirectory As String
         Dim asEmailContent() As String
         Dim sEmailContent As String
         Dim asRSSFeedContent() As String
@@ -3896,7 +3860,6 @@ Module CommonFunctions
         blnBuildNSFConversionRubyScript = False
 
         Dim NSFConversionRuby As StreamWriter
-        Dim asSourceLocations() As String
 
         NSFConversionRuby = New StreamWriter(sRubyScriptFileName)
 
@@ -4058,30 +4021,11 @@ Module CommonFunctions
 
     Public Function blnBuildArchiveExtractionJSon(ByVal sJSonFileName As String, ByVal sSourceFolders As String, ByVal sEvidenceKeyStore As String, ByVal sCaseName As String, ByVal sMigrationType As String, ByVal sSourceSize As String, ByVal bCentera As Boolean) As Boolean
         Dim sMachineName As String
-        Dim sOutputFileName As String
 
-        Dim sFileFiltering As String
-        Dim sFilterFileExt As String
-        Dim sCommunicationCSV As String
-        Dim sPropertiesCSV As String
-        Dim sCaseSensitive As String
-        Dim sVerbose As String
-        Dim sUnresponsive As String
-        Dim sTagItems As String
-        Dim sTagUnique As String
-        Dim sReportItems As String
-        Dim sReportQueries As String
-        Dim sExcludeItem As String
-        Dim sFilterMimeTypes As String
-        Dim sFilterKinds As String
-        Dim sTextQueriesCSV As String
-        Dim sUseRegEx As String
-        Dim sReportDirectory As String
         Dim asCenteraInfo() As String
         Dim sClipFile As String
         Dim sIPFile As String
         Dim FlatExtractJSonFile As StreamWriter
-
 
         blnBuildArchiveExtractionJSon = False
 
@@ -4133,7 +4077,6 @@ Module CommonFunctions
 
         Dim ExtractionBatchFile As StreamWriter
 
-        Dim sStartUpBatchFileName As String
         Dim sLicenceSourceType As String
 
         If sNMSSourceType = "Desktop" Then
@@ -4314,8 +4257,6 @@ Module CommonFunctions
 
     Public Function blnBuildArchiveExtractionWSSJSon(ByVal sWSSJsonFileName As String, ByVal lstWSSSettings As List(Of String), ByVal sProcessingType As String, ByVal sCaseDirectory As String) As Boolean
         Dim sMachineName As String
-        Dim sOutputFileName As String
-
         Dim sFileFiltering As String
         Dim sFilterFileExt As String
         Dim sCommunicationCSV As String
@@ -4432,7 +4373,6 @@ Module CommonFunctions
 
     Public Function blnBuildUpdatedArchiveExtractionWSSJSon(ByVal sWSSJsonFileName As String, ByVal lstWSSSettings As List(Of String), ByVal sProcessingType As String, ByVal sCaseDirectory As String) As Boolean
         Dim sMachineName As String
-        Dim sOutputFileName As String
 
         Dim sFileFiltering As String
         Dim sFilterFileExt As String
@@ -5378,7 +5318,6 @@ Module CommonFunctions
     Public Function blnGetAllExporterMetrics(ByVal sCaseDirectory As String, ByRef lstExporterMetrics As List(Of String)) As Boolean
         Dim CurrentDirectory As DirectoryInfo
         Dim asSubDirectories(0) As String
-        Dim bStatus As Boolean
 
         Array.Clear(asSubDirectories, 0, asSubDirectories.Length)
         ReDim asSubDirectories(0)
@@ -5414,7 +5353,6 @@ Module CommonFunctions
     Public Function blnGetAllExporterErrors(ByVal sCaseDirectory As String, ByRef lstExportErrors As List(Of String)) As Boolean
         Dim CurrentDirectory As DirectoryInfo
         Dim asSubDirectories(0) As String
-        Dim bStatus As Boolean
 
         Array.Clear(asSubDirectories, 0, asSubDirectories.Length)
         ReDim asSubDirectories(0)
@@ -5451,7 +5389,6 @@ Module CommonFunctions
     Public Function blnGetAllFailureLogs(ByVal sExportDirectory As String, ByRef lstFailureLogs As List(Of String)) As Boolean
         Dim CurrentDirectory As DirectoryInfo
         Dim asSubDirectories(0) As String
-        Dim bStatus As Boolean
 
         Array.Clear(asSubDirectories, 0, asSubDirectories.Length)
         ReDim asSubDirectories(0)

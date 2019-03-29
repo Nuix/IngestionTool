@@ -168,7 +168,6 @@ Public Class NSFConversion
         Dim lstDuplicateMappingDestinationSMTP As List(Of String)
         Dim lstDuplicateMappingCustodianGroupID As List(Of String)
         Dim lstUniqueGroupID As List(Of String)
-        Dim bStatus As Boolean
         Dim iPercentComplete As Integer
 
         Dim iCustodianIndex As Integer
@@ -290,7 +289,6 @@ Public Class NSFConversion
         Dim lstSelectedCustodiansInfo As List(Of String)
         Dim lstProcessingCustodians As List(Of String)
         Dim asCustodianInfo() As String
-        Dim sSourceDirectory As String
 
         Dim sNuixAppMemory As String
 
@@ -363,7 +361,6 @@ Public Class NSFConversion
         Dim NuixConsoleProcess As Process
         Dim NuixConsoleProcessStartInfo As ProcessStartInfo
 
-        Dim sCompletedFolder As String
         Dim sCurrentFolder As String
         Dim sInProgressFolder As String
 
@@ -377,7 +374,6 @@ Public Class NSFConversion
         Dim iNumberItemsExported As Double
         Dim dPercentFailed As Decimal
         Dim sProcessID As String
-        Dim aProcess As System.Diagnostics.Process
         Dim bStatus As Boolean
 
         Dim iNumberOfNuixInstancesRunning As Integer
@@ -597,7 +593,6 @@ Public Class NSFConversion
     Public Function blnInsertDataConversionStats(ByVal sSQLLiteLocation As String, ByVal sCustodianName As String, ByRef iCustodianID As Integer, ByVal sGroupID As String, ByVal sStatus As String, ByVal sProcessID As String, ByVal sRedisSettings As String, ByVal sSourceType As String, ByVal sSourceFormat As String, ByVal sOutputType As String, ByVal sOutputFormat As String, ByVal sConversionStartTime As String, ByVal sConversionEndTime As String, ByVal iBytesProcessed As Integer, ByVal iPercentComplete As Integer, ByVal iSuccess As Integer, ByVal iFailed As Integer, ByVal sSummaryReportLocation As String) As Boolean
         blnInsertDataConversionStats = False
         Dim sInsertArchiveExtractionData As String
-        Dim sUpdateEArchiveExtractionData As String
         Dim sQueryReturnedCustodianID As String
         Dim SQLiteConnection As SQLiteConnection
 
@@ -720,14 +715,6 @@ Public Class NSFConversion
         Dim sCustodianName As String
         Dim sProgressStatus As String
         Dim dPercentFailed As Decimal
-        Dim bStatus As Boolean
-        Dim sSummaryReportLocation As String
-        Dim sSummaryReportCustodian As String
-        Dim sSummaryReportItemsExported As String
-        Dim sSummaryReportItemsFailed As String
-        Dim sSummaryReportBytesUploaded As String
-        Dim dSummaryReportStartDate As Date
-        Dim dSummaryReportEndDate As Date
         Dim common As New Common
 
         blnRefreshGridFromDB = False
@@ -812,64 +799,16 @@ Public Class NSFConversion
 
     Private Function blnLoadGridFromDB(ByVal grdArchiveBatches As DataGridView) As Boolean
         Dim mSQL As String
-        Dim bStatus As Boolean
         Dim dt As DataTable
         Dim ds As DataSet
         Dim dataReader As SQLiteDataReader
         Dim sqlCommand As SQLiteCommand
         Dim sqlConnection As SQLiteConnection
         Dim BatchRow As DataGridViewRow
-        Dim sArchiveName As String
-        Dim iArchiveNameCol As Integer
-        Dim sBatchName As String
-        Dim iBatchNameCol As Integer
-        Dim sExtractionStatus As String
-        Dim iExtractionStatusCol As Integer
-        Dim sArchiveSettings As String
-        Dim iArchiveSettingsCol As Integer
-        Dim sArchiveType As String
-        Dim iArchiveTypeCol As Integer
-        Dim sSQLSettings As String
-        Dim iSQLSettingsCol As Integer
-        Dim sSourceInformation As String
-        Dim iSourceInformationCol As Integer
-        Dim sProcessStartTime As String
-        Dim iProcessStartTimeCol As Integer
-        Dim sProcessEndTime As String
-        Dim iProcessEndTimeCol As Integer
-        Dim dblItemsProcessed As Double
-        Dim iItemsProcessedCol As Integer
-        Dim dblItemsExported As Double
-        Dim iItemsExportedCol As Integer
-        Dim dblItemsSkipped As Double
-        Dim iItemsSkippedCol As Integer
-        Dim dblItemsFailed As Double
-        Dim iItemsFailedCol As Integer
-        Dim sProcessingFilesDirectory As String
-        Dim iProcessingFilesDirectoryCol As Integer
-        Dim sCaseDirectory As String
-        Dim iCaseDirectoryCol As Integer
-        Dim sOutputDirectory As String
-        Dim iOutputDirectoryCol As Integer
-        Dim sLogDirectory As String
-        Dim iLogDirectoryCol As Integer
-        Dim sSummaryReportLocation As String
-        Dim iSummaryReportLocationCol As Integer
-        Dim sOutputFormat As String
-        Dim iOutputFormatCol As Integer
-        Dim sWSSSettings As String
-        Dim iWSSSettingsCol As Integer
         Dim iRowIndex As Integer
-        Dim sCustodianName As String
         Dim sProgressStatus As String
         Dim dPercentFailed As Decimal
 
-        Dim sSummaryReportCustodian As String
-        Dim sSummaryReportItemsExported As String
-        Dim sSummaryReportItemsFailed As String
-        Dim sSummaryReportBytesUploaded As String
-        Dim dSummaryReportStartDate As Date
-        Dim dSummaryReportEndDate As Date
         blnLoadGridFromDB = False
 
         dt = Nothing
@@ -937,9 +876,7 @@ Public Class NSFConversion
     End Function
 
     Private Sub btnExportProcessingDetails_Click(sender As Object, e As EventArgs) Handles btnExportProcessingDetails.Click
-        Dim sReportFilePath As String
         Dim ReportOutputFile As StreamWriter
-        Dim sReportType As String
         Dim sOutputFileName As String
         Dim sMachineName As String
         Dim sCustodianName As String

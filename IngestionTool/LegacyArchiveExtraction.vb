@@ -2911,17 +2911,7 @@ Public Class LegacyArchiveExtraction
         Dim sEnableMetadataQuery As String
         Dim sNuixConsolePath As String
         Dim sCaseName As String
-        Dim sFileFiltering As String
-        Dim sFilterFileExt As String
         Dim sSearchTermCSV As String
-        Dim sCaseSensitive As String
-        Dim sVerbose As String
-        Dim sUnresponsive As String
-        Dim sTagItems As String
-        Dim sTagUnique As String
-        Dim sReportItems As String
-        Dim sReportQueries As String
-        Dim sExcludeItem As String
         Dim sProcessingType As String
         Dim sWSSSettings As String
         Dim asWSSSettings() As String
@@ -2945,8 +2935,6 @@ Public Class LegacyArchiveExtraction
         Dim sManifestFile As String
         Dim sPSTMappingFile As String
         Dim sExportDir As String
-        Dim sNuixFiles As String
-        Dim asNuixFiles() As String
         Dim sNuixCaseDir As String
         Dim sFromDate As String
         Dim sToDate As String
@@ -2958,11 +2946,6 @@ Public Class LegacyArchiveExtraction
         Dim sTotalItemsProcessed As String
         Dim sTotalItemsFailed As String
         Dim sTotalItemsExported As String
-        Dim sEmailContent As String
-        Dim sRSSFeedContent As String
-        Dim sCalendarContent As String
-        Dim sContactContent As String
-        Dim asSourceInfo() As String
         Dim sSourceSize As String
         Dim sEVUserList As String
         Dim sPercentCompleted As String
@@ -2976,8 +2959,8 @@ Public Class LegacyArchiveExtraction
         Dim sCenteraIPFile As String
         Dim asCenteraFiles() As String
         Dim sSQLPort As String
-        Dim sHostName As String
         Dim common As New Common
+        Dim iNuixConsoleVersion As Decimal
 
         Dim bCentera As Boolean
 
@@ -3085,6 +3068,11 @@ Public Class LegacyArchiveExtraction
                     End If
 
                     sNuixConsolePath = psNuixAppLocation.Replace("nuix_console.exe", "")
+                    Dim regex As Regex = New Regex("\d+.\d+")
+                    Dim match As Match = regex.Match(sNuixConsolePath)
+                    If match.Success Then
+                        iNuixConsoleVersion = match.Value
+                    End If
 
                     Invoke(Sub()
                                sRubyFileName = sProcessingFilesDir & "\" & row.cells("BatchName").value & ".rb"
